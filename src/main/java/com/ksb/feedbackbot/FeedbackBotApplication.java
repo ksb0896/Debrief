@@ -1,5 +1,6 @@
 package com.ksb.feedbackbot;
 
+import com.ksb.feedbackbot.service.UserMessage.FeedbackAnalyzer;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.AppConfig;
 import com.slack.api.bolt.socket_mode.SocketModeApp;
@@ -12,6 +13,12 @@ import org.springframework.context.annotation.Configuration;
 import static com.slack.api.model.block.Blocks.*;
 import static com.slack.api.model.block.composition.BlockCompositions.*;
 import static com.slack.api.model.block.element.BlockElements.*;
+
+// LLM
+import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.service.AiServices;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @SpringBootApplication
 public class FeedbackBotApplication {
@@ -29,7 +36,7 @@ class SlackConfig {
     @Value("${slack.app.token}")
     private String appToken;
 
-    // 1. Define the App Bean (The logic/commands)
+    // Define the App Bean (The logic/commands)
     @Bean
     public App initApp() {
         AppConfig config = AppConfig.builder()
@@ -66,7 +73,7 @@ class SlackConfig {
         return app;
     }
 
-    // 2. Define the SocketModeApp Bean (The connection)
+    // Define the SocketModeApp Bean (The connection)
     // Spring will automatically "inject" the App bean we defined above
     @Bean
     public SocketModeApp socketModeApp(App app) throws Exception {
@@ -77,5 +84,17 @@ class SlackConfig {
         System.out.println("⚡️ Debrief is connected to Slack via Socket Mode!");
 
         return socketApp;
+    }
+
+    @Bean
+    public FeedbackAnalyzer feedbackAnalyzer() {
+        // Creating the model connection
+        OllamaChatModel model = OllamaChatModel.builder()
+                .baseUrl("http://localhost:11434")
+                .modelName("phi3:mini")
+                .build();
+
+        // Creating the service
+        return AiServices.create(FeedbackAnalyzer.class, model);
     }
 }
