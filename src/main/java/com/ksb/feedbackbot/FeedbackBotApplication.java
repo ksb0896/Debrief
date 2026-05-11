@@ -17,8 +17,8 @@ import static com.slack.api.model.block.element.BlockElements.*;
 // LLM
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.service.AiServices;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
 
 @SpringBootApplication
 public class FeedbackBotApplication {
@@ -38,7 +38,7 @@ class SlackConfig {
 
     // Define the App Bean (The logic/commands)
     @Bean
-    public App initApp() {
+    public App initApp(FeedbackAnalyzer analyzer) {
         AppConfig config = AppConfig.builder()
                 .singleTeamBotToken(botToken)
                 .build();
@@ -57,31 +57,59 @@ class SlackConfig {
 
         // Action Handler for "Strong Hire"
         app.blockAction("vote_hire", (req, ctx) -> {
-            String username = req.getPayload().getUser().getName();
-            // Modern SDK uses a response object to update the message
-            ctx.respond(res -> res.text("Decision logged: *" + username + "* voted Strong Hire! ✅").replaceOriginal(true));
-            return ctx.ack();
+            ctx.respond(res -> res.text("AI is analyzing ..").replaceOriginal(true));
+            //non-blocking
+            new Thread(()->{
+                try{
+                    String summary = analyzer.analyze("Candidate has strong Java skills.");
+                    ctx.respond(res -> res.text("*Analysis Complete:*\\n\" + summary").replaceOriginal(true));
+                }catch (Exception e){
+                    try{
+                        ctx.respond(res -> res.text("AI Error:" + e.getMessage()).replaceOriginal(true));
+                    }catch (java.io.IOException ex){
+                        ex.printStackTrace();
+                    }
+                }
+            }).start();
+
+//            String username = req.getPayload().getUser().getName();
+//            // Modern SDK uses a response object to update the message
+//            ctx.respond(res -> res.text("Decision logged: *" + username + "* voted Strong Hire! ✅").replaceOriginal(true));
+//            return ctx.ack();
+            return ctx.ack(); //3 sec exe.
         });
 
         // Action Handler for "No Hire"
         app.blockAction("vote_no_hire", (req, ctx) -> {
             String username = req.getPayload().getUser().getName();
-            ctx.respond(res -> res.text("Decision logged: *" + username + "* voted No Hire. ❌").replaceOriginal(true));
+            ctx.respond(res -> res.text("Logging decision for *" + username + "*...").replaceOriginal(true));
+            //non-blocking
+            new Thread(()->{
+                try{
+                    ctx.respond(res->res.text("Decision logged: *" + username + "* voted No Hire.").replaceOriginal(true));
+                } catch (IOException e) {
+                    try{
+                        ctx.respond(res->res.text("Error logging decision: " + e.getMessage()).replaceOriginal(true));
+                    }catch (java.io.IOException ex){
+                        ex.printStackTrace();
+                    }
+                }
+            }).start();
+
             return ctx.ack();
         });
 
         return app;
     }
 
-    // Define the SocketModeApp Bean (The connection)
-    // Spring will automatically "inject" the App bean we defined above
+    // Define SocketModeApp Bean (The connection)
     @Bean
     public SocketModeApp socketModeApp(App app) throws Exception {
         SocketModeApp socketApp = new SocketModeApp(appToken, app);
 
         // startAsync() connects to Slack in the background without blocking Spring
         socketApp.startAsync();
-        System.out.println("⚡️ Debrief is connected to Slack via Socket Mode!");
+        System.out.println("⚡Debrief is connected to Slack via Socket Mode!");
 
         return socketApp;
     }
