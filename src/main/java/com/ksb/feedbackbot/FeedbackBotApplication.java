@@ -14,6 +14,10 @@ import static com.slack.api.model.block.Blocks.*;
 import static com.slack.api.model.block.composition.BlockCompositions.*;
 import static com.slack.api.model.block.element.BlockElements.*;
 
+//logs
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // LLM
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.service.AiServices;
@@ -35,10 +39,12 @@ class SlackConfig {
 
     @Value("${slack.app.token}")
     private String appToken;
+    private static final Logger logger = LoggerFactory.getLogger(SlackConfig.class);
 
     // Define the App Bean (The logic/commands)
     @Bean
     public App initApp(FeedbackAnalyzer analyzer) {
+        logger.info("Initializing Slack Bolt Application...");
         AppConfig config = AppConfig.builder()
                 .singleTeamBotToken(botToken)
                 .build();
@@ -109,7 +115,7 @@ class SlackConfig {
 
         // startAsync() connects to Slack in the background without blocking Spring
         socketApp.startAsync();
-        System.out.println("⚡Debrief is connected to Slack via Socket Mode!");
+        logger.info("⚡Debrief is connected to Slack via Socket Mode!");
 
         return socketApp;
     }
