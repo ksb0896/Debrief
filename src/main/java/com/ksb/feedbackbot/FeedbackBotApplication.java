@@ -21,10 +21,12 @@ import org.slf4j.LoggerFactory;
 // LLM
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.service.AiServices;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.IOException;
 
 @SpringBootApplication
+@EnableScheduling
 public class FeedbackBotApplication {
     public static void main(String[] args) {
         SpringApplication.run(FeedbackBotApplication.class, args);
