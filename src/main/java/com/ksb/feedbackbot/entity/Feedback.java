@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "feedback")
 @Data
@@ -26,5 +28,8 @@ public class Feedback {
 
     @Column(name = "summary")
     private String summary;
+
+    @Column(name = "last_nudge_date")
+    private LocalDateTime lastNudgeDate;
 
 }
