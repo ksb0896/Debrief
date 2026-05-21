@@ -54,5 +54,6 @@ public class FeedbackNudgeService {
                 logger.info("CRITICAL: Failed to nudge user {}. Reason: {}", feedback.getSlackUserId(), e.getMessage());
             }
         }
+        SchedulerHealthIndicator.lastRunTime = LocalDateTime.now();
     }
 }
