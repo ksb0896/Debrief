@@ -1,6 +1,8 @@
 package com.ksb.feedbackbot;
 
+import com.ksb.feedbackbot.entity.Feedback;
 import com.ksb.feedbackbot.service.UserMessage.FeedbackAnalyzer;
+import com.ksb.feedbackbot.service.UserMessage.FeedbackValidatorService;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.AppConfig;
 import com.slack.api.bolt.socket_mode.SocketModeApp;
@@ -42,6 +44,11 @@ class SlackConfig {
     @Value("${slack.app.token}")
     private String appToken;
     private static final Logger logger = LoggerFactory.getLogger(SlackConfig.class);
+    private final FeedbackValidatorService feedbackValidatorService;
+
+    public SlackConfig(FeedbackValidatorService feedbackValidatorService) {
+        this.feedbackValidatorService = feedbackValidatorService;
+    }
 
     // Define the App Bean (The logic/commands)
     @Bean
@@ -69,13 +76,21 @@ class SlackConfig {
             //non-blocking
             new Thread(()->{
                 try{
-                    String summary = analyzer.analyze("Candidate has strong Java skills.");
-                    ctx.respond(res -> res.text("*Analysis Complete:*\\n\" + summary").replaceOriginal(true));
-                }catch (Exception e){
+                    Feedback feedback = new Feedback();
+                    feedbackValidatorService.saveFeedback(feedback);
+                    ctx.respond(res -> res.text("Feedback saved!").replaceOriginal(true));
+                }catch (IllegalArgumentException e){
                     try{
-                        ctx.respond(res -> res.text("AI Error:" + e.getMessage()).replaceOriginal(true));
-                    }catch (java.io.IOException ex){
-                        ex.printStackTrace();
+                        ctx.respond(res -> res.text("*Validation Error:* " + e.getMessage()).replaceOriginal(true));
+                    }catch (Exception ex){
+                        logger.error("Error sending validation response", ex);
+                    }
+                } catch (Exception e) {
+                    logger.error("System error during feedback processing", e);
+                    try{
+                        ctx.respond(res -> res.text("An internal error occurred. Please try again.").replaceOriginal(true));
+                    }catch (Exception ex){
+                        logger.error("Error sending system error response", ex);
                     }
                 }
             }).start();

@@ -5,9 +5,11 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import com.ksb.feedbackbot.repo.FeedbackRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+@Service
 public class FeedbackValidatorService {
 
     private final Validator validator;
