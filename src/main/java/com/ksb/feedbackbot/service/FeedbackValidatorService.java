@@ -1,10 +1,10 @@
-package com.ksb.feedbackbot.service.UserMessage;
+package com.ksb.feedbackbot.service;
 
 import com.ksb.feedbackbot.entity.Feedback;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import com.ksb.feedbackbot.repo.FeedbackRepository;
+import com.ksb.feedbackbot.repository.FeedbackRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;

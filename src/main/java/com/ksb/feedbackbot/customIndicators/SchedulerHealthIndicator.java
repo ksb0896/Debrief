@@ -1,4 +1,4 @@
-package com.ksb.feedbackbot.service.UserMessage;
+package com.ksb.feedbackbot.customIndicators;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;

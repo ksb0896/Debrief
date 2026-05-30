@@ -1,4 +1,4 @@
-package com.ksb.feedbackbot.service.UserMessage;
+package com.ksb.feedbackbot.service;
 import dev.langchain4j.service.UserMessage;
 
 public interface FeedbackAnalyzer {

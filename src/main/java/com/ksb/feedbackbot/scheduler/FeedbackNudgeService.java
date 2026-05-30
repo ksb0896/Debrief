@@ -1,7 +1,8 @@
-package com.ksb.feedbackbot.service.UserMessage;
+package com.ksb.feedbackbot.scheduler;
 
+import com.ksb.feedbackbot.customIndicators.SchedulerHealthIndicator;
 import com.ksb.feedbackbot.entity.Feedback;
-import com.ksb.feedbackbot.repo.FeedbackRepository;
+import com.ksb.feedbackbot.repository.FeedbackRepository;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import org.slf4j.Logger;

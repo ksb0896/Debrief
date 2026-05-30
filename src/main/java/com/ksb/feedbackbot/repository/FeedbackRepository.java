@@ -1,4 +1,4 @@
-package com.ksb.feedbackbot.repo;
+package com.ksb.feedbackbot.repository;
 
 import com.ksb.feedbackbot.entity.Feedback;
 import org.springframework.data.jpa.repository.JpaRepository;
