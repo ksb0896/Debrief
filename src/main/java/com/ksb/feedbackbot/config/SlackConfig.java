@@ -84,7 +84,7 @@ class SlackConfig {
 
 //            String username = req.getPayload().getUser().getName();
 //            // Modern SDK uses a response object to update the message
-//            ctx.respond(res -> res.text("Decision logged: *" + username + "* voted Strong Hire! ✅").replaceOriginal(true));
+//            ctx.respond(res -> res.text("Decision logged: *" + username + "* voted Strong Hire!").replaceOriginal(true));
 //            return ctx.ack();
             return ctx.ack(); //3 sec exe.
         });

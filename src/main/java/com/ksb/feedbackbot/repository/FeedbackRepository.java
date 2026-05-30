@@ -11,4 +11,5 @@ import java.util.List;
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     List<Feedback> findBySummaryIsNull();
     List<Feedback> findBySummaryIsNullAndLastNudgeDateBeforeOrLastNudgeDateIsNull(LocalDateTime date);
+    List<Feedback> findByCandidateNameIgnoreCase(String candidateName);
 }
